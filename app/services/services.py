@@ -1,0 +1,27 @@
+import requests
+import time
+
+
+def check_service(service):
+    start = time.time()
+
+    try:
+        response = requests.get(service.url, timeout=5)
+        duration = int((time.time() - start) * 1000)
+
+        status = "UP" if response.status_code == service.expected_status else "DOWN"
+
+        return {
+            "status": status,
+            "status_code": response.status_code,
+            "response_time_ms": duration,
+            "error_message": None
+        }
+
+    except Exception as e:
+        return {
+            "status": "DOWN",
+            "status_code": None,
+            "response_time_ms": None,
+            "error_message": str(e)
+        }
