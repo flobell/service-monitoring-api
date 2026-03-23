@@ -11,6 +11,7 @@ from alembic import context
 # import your model's MetaData object here
 from app.db.base import Base
 from app.db.models.services import Service
+from app.db.models.metrics import Metric
 
 # Load environment variables from .env file
 load_dotenv() 

@@ -4,10 +4,10 @@ from app.db.session import get_db
 from app.db.models.services import Service
 from app.schemas.services import ServiceCreate
 
-router = APIRouter()
+router = APIRouter(prefix="/services", tags=["services"])
 
 
-@router.post("/services")
+@router.post("")
 def create_service(service: ServiceCreate, db: Session = Depends(get_db)):
     new_service = Service(**service.model_dump())
     db.add(new_service)

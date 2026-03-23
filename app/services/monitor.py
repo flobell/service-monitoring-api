@@ -1,5 +1,8 @@
 import requests
 import time
+from app.db.session import SessionLocal
+from app.db.models.services import Service
+from app.db.models.metrics import Metric
 
 
 def check_service(service):
@@ -25,3 +28,21 @@ def check_service(service):
             "response_time_ms": None,
             "error_message": str(e)
         }
+
+
+def check_all_services():
+    db = SessionLocal()
+
+    services = db.query(Service).filter(Service.is_active is True).all()
+
+    for service in services:
+        result = check_service(service)
+
+        metric = Metric(
+            service_id=service.id,
+            **result
+        )
+
+        db.add(metric)
+
+    db.commit()

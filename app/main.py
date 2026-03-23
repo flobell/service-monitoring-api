@@ -1,10 +1,20 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from app.workers.scheduler import start_scheduler
+from app.api.v1 import PREFIX
 from app.api.v1 import services
+from app.api.v1 import metrics
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
 
-app.include_router(services.router)
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(services.router, prefix=PREFIX, tags=["services"])
+app.include_router(metrics.router, prefix=PREFIX, tags=["metrics"])
 
 
 @app.get("/")
