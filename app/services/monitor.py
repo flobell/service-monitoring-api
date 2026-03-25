@@ -46,3 +46,23 @@ def check_all_services():
         db.add(metric)
 
     db.commit()
+
+
+def get_consecutive_failures(db, service_id, limit=3):
+    metrics = (
+        db.query(Metric)
+        .filter(Metric.service_id == service_id)
+        .order_by(Metric.checked_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+    failures = 0
+
+    for m in metrics:
+        if m.status == "DOWN":
+            failures += 1
+        else:
+            break
+
+    return failures

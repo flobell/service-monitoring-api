@@ -3,6 +3,9 @@ from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 from app.db.models.services import Service
 from app.db.models.metrics import Metric
+from app.services.monitor import get_consecutive_failures
+
+FAIL_THRESHOLD = 3
 
 
 def get_services_status(db: Session):
@@ -24,7 +27,9 @@ def get_services_status(db: Session):
         if not last_metric:
             continue
 
-        status = last_metric.status
+        failures = get_consecutive_failures(db, service.id)
+        status = "DOWN" if failures >= FAIL_THRESHOLD else "UP"
+        # status = last_metric.status
 
         if status == "UP":
             up_count += 1
